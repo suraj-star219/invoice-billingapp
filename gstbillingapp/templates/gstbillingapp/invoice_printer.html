@@ -1,0 +1,278 @@
+{% extends "gstbillingapp/print_base.html" %}
+
+
+{% block content %}
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<style>
+	/* body{
+		background-color: #FFE7E9;
+	} */
+	.text_bold {
+		font-weight: 600;
+		color: #00B0F0;
+	}
+	.container_1{
+		background-color: #FFE7E9;
+	}
+	.bill_test{
+		font-weight: 600;
+		color: #FF0000;
+	}
+	.fa {
+		{% comment %} font-size: 25px;
+		width: 60px; {% endcomment %}
+		padding: 2px;
+		text-align: center;
+		text-decoration: none;
+		margin: 0px 2px;
+	  }
+	  
+	.fa:hover {
+		  opacity: 0.7;
+	}
+	  
+	.fa-facebook {
+		background: #3B5998;
+		color: white;
+	}
+	  
+	.fa-twitter {
+		background: #55ACEE;
+		color: white;
+	}
+	.fa-linkedin {
+		background: #007bb5;
+		color: white;
+	}
+	.fa-instagram {
+		background: #125688;
+		color: white;
+	}
+	.fa-whatsapp {
+		background: #dd4b39;
+		color: white;
+	}
+	.card_container {
+		{% comment %} margin:0 auto; {% endcomment %}
+        border: none;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        background: white;
+    }
+	
+</style>
+
+
+<div class="container container_1 pb-5 border">
+	<div class="d-flex justify-content-between align-items-center my-3 px-3">
+		<h1 class="text_bold text-invoice">Invoice</h1>
+		<!-- <img src="/home/shivilao/invoice/static/gstbillingapp/images/shivilaLogoImg.png" height="135" width="350px" alt=""> -->
+		<img src="../static/gstbillingapp/images/shivilaLogoImg.png" height="135" width="350px" alt="">
+	</div>
+	<div class="div mb-5 container">
+		<p><strong>Invoice No:{{invoice.invoice_number}}</strong></p>
+		<p><strong>Date of issue: {{invoice.invoice_date}}</strong></p>
+
+		<div class="col-sm-6 col-md-6 col-lg-6 col-6">
+			<strong><h5 class="mb-3 bill_test">Billed To:</h5></strong>
+			<div>
+				<strong>Name: {{ invoice_data.customer_name }}</strong>
+			</div>
+			<div>Address: {{ invoice_data.customer_address }}</div>
+			<div>Phone: {{ invoice_data.customer_phone }}</div>
+			<div>GST No: {{ invoice_data.customer_gst }}</div>
+			{% if invoice_data.vehicle_number %}
+			<div><strong>Vehicle No:</strong> {{ invoice_data.vehicle_number }}</div>
+			{% endif %}
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-header">
+			<div class="row">
+				<div class="col-sm-6 col-6"><strong>Invoice Date: {{invoice.invoice_date}}</strong></div>
+				<div class="col-sm-6 text-right col-6"><strong>Invoice No:{{invoice.invoice_number}}</strong></div>
+			</div>
+		</div>
+
+		<div class="card-body">
+			<div class="row">
+
+
+				<div class="col-sm-6 col-md-6 col-lg-6 col-6">
+					<div>
+						<strong>{{user_profile.business_title}}</strong>
+					</div>
+					<div id="invoice_profile_data">{{user_profile.business_address}}</div>
+					{% if user_profile.business_email %}
+					<div>EMAIL: {{user_profile.business_email}}</div>
+					{% endif %}
+					{% if user_profile.business_phone %}
+					<div>Phone: {{user_profile.business_phone}}</div>
+					{% endif %}
+					{% if user_profile.business_gst %}
+					<div>GST No: {{user_profile.business_gst}}</div>
+					{% endif %}
+				</div>
+
+
+
+				
+
+
+
+			</div>
+
+			<div class="table-responsive-sm d-flex justify-content-end">
+				<table class="table table-striped table-invoice">
+					<thead>
+						<tr>
+							<th class="text-center">#</th>
+							<th class="text-left">Item</th>
+							<th class="text-left"></th>
+							<!-- <th class="text-center">HSN / SAC</th> -->
+							<th class="text-center">Unit</th>
+							<th class="text-right">Qty</th>
+							<th class="text-right">Rate ({{ currency }})</th>
+							<th class="text-right">Taxable Amount ({{ currency }})</th>
+							<th class="text-right">GST (%)</th>
+							{% if invoice_data.igstcheck %}
+							<th class="text-right">IGST ({{ currency }})</th>
+							{% else %}
+							<th class="text-right">CGST ({{ currency }})</th>
+							<th class="text-right">SGST ({{ currency }})</th>
+							{% endif %}
+							<th class="text-right">Total Amount ({{ currency }})</th>
+
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in invoice_data.items %}
+						<tr>
+							<td class="text-center">{{ forloop.counter }}</td>
+							<td class="text-left strong">{{ item.invoice_product }}</td>
+							<td class="text-left strong"></td>
+							<!-- <td class="text-center">{{ item.invoice_hsn }}</td> -->
+							<td class="text-center">{{ item.invoice_unit }}</td>
+							<td class="text-right">{{ item.invoice_qty }}</td>
+							<td class="text-right">{{ item.invoice_rate_without_gst|floatformat:2 }}</td>
+							<td class="text-right">{{ item.invoice_amt_without_gst|floatformat:2 }}</td>
+							<td class="text-right">{{ item.invoice_gst_percentage }}</td>
+							{% if invoice_data.igstcheck %}
+							<td class="text-right">{{ item.invoice_amt_igst|floatformat:2 }}</td>
+							{% else %}
+							<td class="text-right">{{ item.invoice_amt_cgst|floatformat:2 }}</td>
+							<td class="text-right">{{ item.invoice_amt_sgst|floatformat:2 }}</td>
+							{% endif %}
+							<td class="text-right">{{ item.invoice_amt_with_gst|floatformat:2 }}</td>
+						</tr>
+						{% endfor %}
+
+						<tr id="table-invoice-total-row">
+							{% if invoice_data.igstcheck %}
+							<td class="text-right" colspan="6">Total: </td>
+							<td class="text-right">{{ currency }}
+								{{ invoice_data.invoice_total_amt_without_gst|floatformat:2 }}</td>
+							<td class="text-right"></td>
+							<td class="text-right">{{ currency }} {{invoice_data.invoice_total_amt_igst|floatformat:2 }}
+							</td>
+							{% else %}
+							<td class="text-right" colspan="6">Total: </td>
+							<td class="text-right">{{ currency }}
+								{{ invoice_data.invoice_total_amt_without_gst|floatformat:2 }}</td>
+							<td class="text-right"></td>
+							<td class="text-right">{{ currency }} {{invoice_data.invoice_total_amt_cgst|floatformat:2 }}
+							</td>
+							<td class="text-right">{{ currency }} {{invoice_data.invoice_total_amt_sgst|floatformat:2 }}
+							</td>
+							{% endif %}
+							<td class="text-right"><strong>{{ currency }}
+									{{ invoice_data.invoice_total_amt_with_gst|floatformat:2 }}</strong></td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+
+			<div class="row">
+
+
+				<div class="col-sm-6 col-lg-6 col-md-6">
+					<!-- <img src="gstbillingapp/static/gstbillingapp/images/paid.png" height="100" width="100" alt=""> -->
+					
+				</div>
+
+				<div class="col-sm-6 col-lg-6 col-md-6">
+					<table class="table text-right" id="invoice-grand-total-table">
+						<tr>
+							<td>Total Taxable Amount: </td>
+							<td>{{ currency }} {{ invoice_data.invoice_total_amt_without_gst|floatformat:2 }}</td>
+						</tr>
+						{% if invoice_data.igstcheck %}
+						<tr>
+							<td>IGST: </td>
+							<td>{{ currency }} {{ invoice_data.invoice_total_amt_igst|floatformat:2 }}</td>
+						</tr>
+						{% else %}
+						<tr>
+							<td>CGST: </td>
+							<td>{{ currency }} {{ invoice_data.invoice_total_amt_cgst|floatformat:2 }}</td>
+						</tr>
+						<tr>
+							<td>SGST: </td>
+							<td>{{ currency }} {{ invoice_data.invoice_total_amt_sgst|floatformat:2 }}</td>
+						</tr>
+						{% endif %}
+						<tr>
+							<td>Invoice Total: </td>
+							<td>{{ currency }} {{invoice_data.invoice_total_amt_with_gst|floatformat:2 }}</td>
+						</tr>
+						<tr>
+							<td colspan="2" class="text-middle">
+								Invoice Total In Words: {{ total_in_words }} only.
+							</td>
+						</tr>
+						<tr id="invoice-signature-row">
+							<td colspan="2"></td>
+						</tr>
+						<tr id="invoice-signature-text-row">
+							<td colspan="2">Authorized Signatory<br> SHIVILA TECHNOLOGIES PRIVATE LIMITED </td>
+						</tr>
+					</table>
+
+
+				</div>
+				<div class="col-sm-6 col-lg-12 col-md-6 d-flex justify-content-end">
+					<!-- <img src="/home/shivilao/invoice/static/gstbillingapp/images/paid.png" height="100" width="100" alt=""> -->
+					<img src="../static/gstbillingapp/images/paid.png" height="70" width="70" alt="">
+				</div>
+				<div class="w-100 d-flex justify-content-center align-items-center">
+					<div class= "card_container w-70 d-flex justify-content-center align-items-center flex-column">
+						<img src="../static/gstbillingapp/images/shivilaLogoImg.png" height="25" width="100px" alt="">
+						<p>This <span style= "font-weight: bold;">Payment</span> Should Only Be <span style= "font-weight: bold;">Made</span> In SHIVILA TECHNOLOGIES PRIVATE LIMITED </p>
+						<p>Payment Link<a href="https://pages.razorpay.com/shivilatechnologies"> PAYNOW</a> for Bank Details, <a href="https://shivila.com/bank-details/">click</a><a href="http://www.shivila.com/"> www.shivila.com</a></p>
+						<!-- Add font awesome icons -->
+						<div class="d-flex justify-content-center align-items-center">
+							<a href=" http://www.facebook.com/Shivila-Technologies-Private-Limited-103738392217809" class="fa fa-facebook"></a>
+							<a href=" https://www.twitter.com/ShivilaIn" class="fa fa-twitter"></a>
+							<a href="https://www.instagram.com/shivilatechnologies/" class="fa fa-instagram"></a>
+							<a href="https://www.linkedin.com/company/31513632/admin/" class="fa fa-linkedin"></a>
+							<a href="https://wa.me/918335935735?text=Hello" class="fa fa-whatsapp"></a>
+						</div>
+						<p style= "font-weight: bold;">ADDRESS: 24/8A Manujendra Dutta Road, Kolkata – 700 028 West Bengal , India</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+<button onclick="window.print();" class="btn btn-primary d-print-none">Print Invoice</button>
+
+
+{% endblock %}
